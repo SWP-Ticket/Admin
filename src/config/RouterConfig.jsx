@@ -14,6 +14,12 @@ export const Routers = {
       route: "/admin/events",
     },
   },
+  staff: {
+    events: {
+      label: "Events",
+      route: "/staff/events",
+    },
+  },
   eventOperator: {
     events: {
       label: "Events",

@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { EventOperatorLinks, AdminLinks } from "@/constants/index";
+import { EventOperatorLinks, AdminLinks, StaffLinks } from "@/constants/index";
 
 function Sidebar() {
   const location = useLocation();
   let LinkRouter = location.pathname.startsWith("/admin")
     ? AdminLinks
+    : location.pathname.startsWith("/staff")
+    ? StaffLinks
     : EventOperatorLinks;
 
   return (

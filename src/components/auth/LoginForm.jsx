@@ -18,6 +18,9 @@ const LoginForm = () => {
       if (role === "Admin") {
         navigate("/admin/user-management");
       }
+      if (role === "Staff") {
+        navigate("/staff/events");
+      }
     } catch (err) {
       console.log(err);
     }
