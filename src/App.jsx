@@ -28,6 +28,7 @@ const eventOperatorRoutes = [
   { path: Routers.eventOperator.events.route, element: <EventsOperatorPage /> },
 ];
 function App() {
+  console.log("test")
   return (
     <div className="app">
       <Router>
