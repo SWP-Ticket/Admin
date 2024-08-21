@@ -13,121 +13,69 @@ import UserTableRow from "./UserTableRow";
 import EditUserForm from "@/pages/Admin/UserManagement/EditUserForm";
 import { CreateUserForm } from "@/pages/Admin/UserManagement/CreateUserForm";
 import useFetch from "@/hooks/useFetch";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
+import { Button } from "../ui/button";
 
 const ITEMS_PER_PAGE = 7;
 
-const fetchUser = (page, pageSize) =>
+const fetchUser = (eventId) =>
   fetch(
-    `${import.meta.env.VITE_API_KEY}/api/User?page=${page}&pageSize=${pageSize}`
+    `${import.meta.env.VITE_API_KEY}/api/Attendee/event/${eventId}/attendees`
   );
 
 function UserTable() {
+  const { eventId } = useParams();
+  const navigate = useNavigate();
   const refetch = useAppStore((state) => state.refetch);
-  const [searchParams, setSearchParams] = useSearchParams({ page: "1" });
-  const [editingUser, setEditingUser] = useState(null);
 
-  const [responseUser] = useFetch(
-    fetchUser,
-    searchParams.get("page"),
-    ITEMS_PER_PAGE
+  const [responseUser] = useFetch(fetchUser, eventId);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(
+    (responseUser ? responseUser?.data?.length : 0) / ITEMS_PER_PAGE
   );
 
   const handlePageChange = (page) => {
-    if (page === 0) return;
-
-    if (page > 0 && page <= responseUser.data.totalPage) {
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        size: ITEMS_PER_PAGE.toString(),
-      });
-
-      setSearchParams(queryParams.toString());
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentData = responseUser
+    ? responseUser?.data?.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    : [];
 
-  const handleCreate = async (newUser) => {
+  const handleCheckin = async (userId) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_KEY}/api/User`, {
-        method: "POST", // HTTP method
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
-    } catch (err) {
-      console.log(err);
-    }
-    // setUsers((prevUsers) => [...prevUsers, newUser]);
-  };
-  const handleDelete = async (id) => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_KEY}/api/User/${id}/status`,
+      await fetch(
+        `${
+          import.meta.env.VITE_API_KEY
+        }/api/Attendee/attendee/${userId}/checkin`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             Accept: "*/*",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            status: "Inactive",
-          }),
+          body: JSON.stringify("string"),
         }
       );
-
-      if (!res.ok) {
-        throw new Error("Failed to update user status");
-      }
-
-      const data = await res.json();
-      console.log(data);
-      refetch();
-      // Cập nhật danh sách người dùng sau khi xóa
-      // const updatedUsers = users.filter((user) => user.id !== id);
-      // setUsers(updatedUsers);
-    } catch (err) {
-      console.log("Error:", err);
-    }
-  };
-  const handleEdit = (user) => {
-    setEditingUser(user);
-  };
-
-  const handleSaveEdit = async (updatedUser) => {
-    // setUsers((prevUsers) =>
-    //   prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-    // );
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_KEY}/api/User`, {
-        method: "PUT",
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedUser),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update user status");
-      }
-
-      const data = await res.json();
-      console.log(data);
       refetch();
     } catch (err) {
       console.log(err);
     }
-    setEditingUser(null);
   };
-
   return (
     <div>
-      <div className="flex justify-between  items-center px-3 py-5">
-        <h1 className="text-2xl  font-semibold">User Management</h1>
-        <CreateUserForm onCreate={handleCreate} />
+      <div className="flex gap-5  items-center px-3 py-5">
+        <Button
+          onClick={() => navigate("/staff/events")}
+          className="bg-blue-500 hover:bg-blue-600"
+        >
+          Back
+        </Button>
+        <h1 className="text-2xl  font-semibold">List User</h1>
       </div>
       <div className="flex flex-col h-[73vh] justify-between">
         <Table>
@@ -135,14 +83,13 @@ function UserTable() {
             <UserHeaderRow />
           </TableHeader>
           <TableBody>
-            {responseUser?.data?.listData.map((item) => (
+            {currentData.map((item) => (
               <UserTableRow
                 key={item.id}
                 item={item}
-                onEdit={() => {
-                  handleEdit(item);
+                onCheckin={() => {
+                  handleCheckin(item.id);
                 }}
-                onDelete={() => handleDelete(item.id)}
               />
             ))}
           </TableBody>
@@ -151,13 +98,13 @@ function UserTable() {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => handlePageChange(responseUser?.data?.page - 1)}
+                onClick={() => handlePageChange(currentPage - 1)}
               />
             </PaginationItem>
-            {[...Array(responseUser?.data?.totalPage)].map((_, index) => (
+            {[...Array(totalPages)].map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
-                  isActive={index + 1 === responseUser?.data?.page}
+                  isActive={index + 1 === currentPage}
                   onClick={() => handlePageChange(index + 1)}
                 >
                   {index + 1}
@@ -166,18 +113,11 @@ function UserTable() {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(responseUser?.data?.page + 1)}
+                onClick={() => handlePageChange(currentPage + 1)}
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-        {editingUser && (
-          <EditUserForm
-            user={editingUser}
-            onClose={() => setEditingUser(null)}
-            onSave={handleSaveEdit}
-          />
-        )}
       </div>
     </div>
   );

@@ -1,5 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { EventOperatorLinks, AdminLinks, StaffLinks } from "@/constants/index";
+import {
+  EventOperatorLinks,
+  AdminLinks,
+  StaffLinks,
+  SponsorLinks,
+} from "@/constants/index";
 
 function Sidebar() {
   const location = useLocation();
@@ -7,6 +12,8 @@ function Sidebar() {
     ? AdminLinks
     : location.pathname.startsWith("/staff")
     ? StaffLinks
+    : location.pathname.startsWith("/sponsor")
+    ? SponsorLinks
     : EventOperatorLinks;
 
   return (

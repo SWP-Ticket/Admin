@@ -1,6 +1,6 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "../ui/button";
-function UserTableRow({ item, onCheckin }) {
+function UserTableRow({ item, onGift }) {
   return (
     <TableRow
       className="items-center grid md:grid-cols-5 lg:grid-cols-5 grid-cols-3  font-medium rounded-md  bg-[#FAFAFA]  mt-3  border-none py-2"
@@ -16,16 +16,14 @@ function UserTableRow({ item, onCheckin }) {
         {item?.checkInStatus}
       </TableCell>
       <TableCell className="text-center py-2">
-        {item?.checkInStatus !== "CheckedIn" && (
-          <Button
-            variant="secondary"
-            onClick={() => {
-              onCheckin();
-            }}
-          >
-            Checkin
-          </Button>
-        )}
+        <Button
+          variant="secondary"
+          onClick={() => {
+            onGift();
+          }}
+        >
+          Gift
+        </Button>
       </TableCell>
     </TableRow>
   );

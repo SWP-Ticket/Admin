@@ -4,24 +4,37 @@ import { Label } from "../ui/label";
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "@/stores/auth.store";
 import { useNavigate } from "react-router";
+import { useToast } from "../ui/use-toast";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const loginUser = useAuthStore((state) => state.loginUser);
   const { register, handleSubmit } = useForm();
+  const { toast } = useToast();
   const onSubmit = async (values) => {
     console.log(values);
     try {
       const data = await loginUser(values);
       console.log(data);
       const { role } = data;
+      toast({
+        title: "Success!",
+        description: "Login Success",
+      });
       if (role === "Admin") {
         navigate("/admin/user-management");
       }
       if (role === "Staff") {
         navigate("/staff/events");
       }
+      if (role === "Sponsor") {
+        navigate("/sponsor/events");
+      }
     } catch (err) {
+      toast({
+        title: "Error!",
+        description: err.message,
+      });
       console.log(err);
     }
   };

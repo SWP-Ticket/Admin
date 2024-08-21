@@ -19,6 +19,20 @@ export const Routers = {
       label: "Events",
       route: "/staff/events",
     },
+    event: {
+      label: "Event",
+      route: "/staff/events/:eventId",
+    },
+  },
+  sponsor: {
+    events: {
+      label: "Events",
+      route: "/sponsor/events",
+    },
+    event: {
+      label: "Event",
+      route: "/sponsor/events/:eventId",
+    },
   },
   eventOperator: {
     events: {

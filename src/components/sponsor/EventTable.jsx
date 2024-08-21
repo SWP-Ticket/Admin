@@ -12,33 +12,35 @@ import EventHeaderRow from "./EventHeaderRow";
 import EventTableRow from "./EventTableRow";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useFetch from "@/hooks/useFetch";
-import { useAuthStore } from "@/stores/auth.store";
 
 const ITEMS_PER_PAGE = 7;
-const fetchEvent = (staffId) =>
-  fetch(`${import.meta.env.VITE_API_KEY}/api/Event/${staffId}/events`);
-function EventTable() {
-  const navigate = useNavigate();
-  const staffId = useAuthStore((state) => state.userId);
-  const [responseEvent] = useFetch(fetchEvent, staffId);
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(
-    (responseEvent ? responseEvent?.data?.assignedEvents?.length : 0) /
-      ITEMS_PER_PAGE
+const fetchEvent = (page, pageSize) =>
+  fetch(
+    `${
+      import.meta.env.VITE_API_KEY
+    }/api/Event?page=${page}&pageSize=${pageSize}`
   );
-
+function EventTable() {
+  const [searchParams, setSearchParams] = useSearchParams({ page: "1" });
+  const navigate = useNavigate();
+  const [responseEvent] = useFetch(
+    fetchEvent,
+    searchParams.get("page"),
+    ITEMS_PER_PAGE
+  );
   const handlePageChange = (page) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
+    if (page === 0) return;
+
+    if (page > 0 && page <= responseEvent.data.totalPage) {
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        size: ITEMS_PER_PAGE.toString(),
+      });
+
+      setSearchParams(queryParams.toString());
     }
   };
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentData = responseEvent
-    ? responseEvent?.data?.assignedEvents?.slice(
-        startIndex,
-        startIndex + ITEMS_PER_PAGE
-      )
-    : [];
+
   return (
     <div>
       <div className="flex justify-between  items-center px-3 py-5">
@@ -50,12 +52,12 @@ function EventTable() {
             <EventHeaderRow />
           </TableHeader>
           <TableBody>
-            {currentData.map((item) => (
+            {responseEvent?.data?.listData.map((item) => (
               <EventTableRow
                 key={item.id}
                 item={item}
                 onView={() => {
-                  navigate(`/staff/events/${item.id}`);
+                  navigate(`/sponsor/events/${item.id}`);
                 }}
               />
             ))}
@@ -65,13 +67,13 @@ function EventTable() {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => handlePageChange(currentPage - 1)}
+                onClick={() => handlePageChange(responseEvent?.data?.page - 1)}
               />
             </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
+            {[...Array(responseEvent?.data?.totalPage)].map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
-                  isActive={index + 1 === currentPage}
+                  isActive={index + 1 === responseEvent?.data?.page}
                   onClick={() => handlePageChange(index + 1)}
                 >
                   {index + 1}
@@ -80,7 +82,7 @@ function EventTable() {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(currentPage + 1)}
+                onClick={() => handlePageChange(responseEvent?.data?.page + 1)}
               />
             </PaginationItem>
           </PaginationContent>

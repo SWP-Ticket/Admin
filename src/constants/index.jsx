@@ -20,6 +20,13 @@ export const StaffLinks = [
     route: Routers.staff.events.route,
   },
 ];
+export const SponsorLinks = [
+  {
+    icon: <Ticket className="h-5 w-5" />,
+    label: Routers.staff.events.label,
+    route: Routers.staff.events.route,
+  },
+];
 export const EventOperatorLinks = [
   {
     icon: <Ticket className="h-5 w-5" />,
