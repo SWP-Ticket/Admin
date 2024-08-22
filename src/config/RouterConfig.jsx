@@ -33,6 +33,10 @@ export const Routers = {
       label: "Event",
       route: "/sponsor/events/:eventId",
     },
+    gifts: {
+      label: "Gifts",
+      route: "/sponsor/gifts",
+    },
   },
   eventOperator: {
     events: {

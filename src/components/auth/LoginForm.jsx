@@ -11,6 +11,7 @@ const LoginForm = () => {
   const loginUser = useAuthStore((state) => state.loginUser);
   const { register, handleSubmit } = useForm();
   const { toast } = useToast();
+
   const onSubmit = async (values) => {
     console.log(values);
     try {

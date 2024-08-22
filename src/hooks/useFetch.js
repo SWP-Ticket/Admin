@@ -2,7 +2,7 @@ import { useAppStore } from "@/stores/app.store";
 import { useState, useEffect, useCallback } from "react";
 
 const useFetch = (fetchFunction, ...args) => {
-  const reFetch = useAppStore((state) => state.isRefecth);
+  const isRefecth = useAppStore((state) => state.isRefecth);
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +30,7 @@ const useFetch = (fetchFunction, ...args) => {
     };
 
     fetchData();
-  }, [memoizedFetchFunction, reFetch]);
+  }, [memoizedFetchFunction, isRefecth]);
 
   return [response, loading, error];
 };

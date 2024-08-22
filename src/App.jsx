@@ -12,6 +12,7 @@ import StaffEventPage from "./pages/Staff/Event/EventPage";
 // Sponsor
 import SponsorEventsPage from "./pages/Sponsor/Events/EventsPage";
 import SponsorEventPage from "./pages/Sponsor/Event/EventPage";
+import GiftsPage from "./pages/Sponsor/Gifts/GiftsPage";
 // Event Operator
 import EventsOperatorPage from "./pages/EventOperator/Events/EventsPage";
 //private router
@@ -31,6 +32,7 @@ const staffRoutes = [
 const sponsorRoutes = [
   { path: Routers.sponsor.events.route, element: <SponsorEventsPage /> },
   { path: Routers.sponsor.event.route, element: <SponsorEventPage /> },
+  { path: Routers.sponsor.gifts.route, element: <GiftsPage /> },
 ];
 
 const eventOperatorRoutes = [

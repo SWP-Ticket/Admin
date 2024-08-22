@@ -57,12 +57,13 @@ function UserTable() {
         },
         body: JSON.stringify(newUser),
       });
+      refetch();
     } catch (err) {
       console.log(err);
     }
     // setUsers((prevUsers) => [...prevUsers, newUser]);
   };
-  const handleDelete = async (id) => {
+  const handleChangeStaus = async (id, status) => {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_KEY}/api/User/${id}/status`,
@@ -73,7 +74,7 @@ function UserTable() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            status: "Inactive",
+            status: status,
           }),
         }
       );
@@ -142,7 +143,7 @@ function UserTable() {
                 onEdit={() => {
                   handleEdit(item);
                 }}
-                onDelete={() => handleDelete(item.id)}
+                onChangeStatus={(value) => handleChangeStaus(item.id, value)}
               />
             ))}
           </TableBody>

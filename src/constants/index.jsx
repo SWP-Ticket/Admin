@@ -1,4 +1,4 @@
-import { Ticket, Users } from "lucide-react";
+import { Ticket, Users, Box } from "lucide-react";
 import { Routers } from "@/config/RouterConfig";
 
 export const AdminLinks = [
@@ -23,8 +23,13 @@ export const StaffLinks = [
 export const SponsorLinks = [
   {
     icon: <Ticket className="h-5 w-5" />,
-    label: Routers.staff.events.label,
-    route: Routers.staff.events.route,
+    label: Routers.sponsor.events.label,
+    route: Routers.sponsor.events.route,
+  },
+  {
+    icon: <Box className="h-5 w-5" />,
+    label: Routers.sponsor.gifts.label,
+    route: Routers.sponsor.gifts.route,
   },
 ];
 export const EventOperatorLinks = [

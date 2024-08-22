@@ -19,29 +19,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import useFetch from "@/hooks/useFetch";
+import { useAuthStore } from "@/stores/auth.store";
 import { useState } from "react";
-export function CreateUserForm({ onCreate }) {
+
+const fetchBooth = () =>
+  fetch(`${import.meta.env.VITE_API_KEY}/api/Booth?page=1&pageSize=10000`);
+export function CreateGiftForm({ onCreate }) {
+  const sponsorId = useAuthStore((state) => state.userId);
+  const [responseBooth] = useFetch(fetchBooth);
+
+  const booths = responseBooth
+    ? responseBooth?.data?.listData.filter((e) => e.sponsorId == sponsorId)
+    : [];
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [description, setDescription] = useState("");
+  const [quantity, setQuantity] = useState(0);
+  const [boothId, setBoothId] = useState("");
 
   const handleSave = async () => {
     try {
-      const newUser = {
+      const newGift = {
         name,
-        email,
-        password,
-        status: "Active",
-        role,
+        description,
+        quantity,
+        boothId,
       };
 
-      onCreate(newUser);
+      onCreate(newGift);
 
       setName("");
-      setEmail("");
-      setPassword("");
-      setRole("");
+      setDescription("");
+      setQuantity("");
+      setBoothId("");
     } catch (err) {
       console.log(err);
     }
@@ -50,13 +61,13 @@ export function CreateUserForm({ onCreate }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600">Create user</Button>
+        <Button className="bg-blue-500 hover:bg-blue-600">Create Gift</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create user</DialogTitle>
+          <DialogTitle>Create gift</DialogTitle>
           <DialogDescription>
-            Create a user here. Click save when you're done.
+            Create a gift here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -73,43 +84,50 @@ export function CreateUserForm({ onCreate }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="email" className="text-right">
-              Email
+            <Label htmlFor="description" className="text-right">
+              Description
             </Label>
-            <Input
-              id="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+            <Textarea
+              id="description"
+              placeholder="Enter description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="password" className="text-right">
-              Password
+            <Label htmlFor="quantity" className="text-right">
+              Quantity
             </Label>
             <Input
-              id="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="quantity"
+              type="number"
+              placeholder="Enter quantity"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="role" className="text-right">
-              Role
+            <Label htmlFor="booth" className="text-right">
+              Booth
             </Label>
-            <Select value={role} onValueChange={setRole}>
+            <Select value={boothId} onValueChange={setBoothId}>
               <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select a role" />
+                <SelectValue placeholder="Select a booth" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
+                  {booths &&
+                    booths.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.name}
+                      </SelectItem>
+                    ))}
                   {/* <SelectItem value="Visitor">Visitor</SelectItem> */}
-                  <SelectItem value={"Organizer"}>Organizer</SelectItem>
-                  <SelectItem value={"Staff"}>Staff</SelectItem>
-                  <SelectItem value={"Sponsor"}>Sponsor</SelectItem>
+                  {/* <SelectItem value={3}>Sponsor</SelectItem>
+                  <SelectItem value={1}>Event Operator</SelectItem>
+                  <SelectItem value={2}>Checking Staff</SelectItem> */}
                 </SelectGroup>
               </SelectContent>
             </Select>
