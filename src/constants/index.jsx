@@ -31,6 +31,11 @@ export const SponsorLinks = [
     label: Routers.sponsor.gifts.label,
     route: Routers.sponsor.gifts.route,
   },
+  {
+    icon: <Box className="h-5 w-5" />,
+    label: Routers.sponsor.booths.label,
+    route: Routers.sponsor.booths.route,
+  },
 ];
 export const EventOperatorLinks = [
   {

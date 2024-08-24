@@ -19,6 +19,7 @@ import EventsOperatorPage from "./pages/EventOperator/Events/EventsPage";
 import AdminRoute from "./routers/AdminRoute";
 import EventOperator from "./routers/EventOperator";
 import StaffRoute from "./routers/StaffRoute";
+import BoothsPage from "./pages/Sponsor/Booths/BoothsPage";
 
 const adminRoutes = [
   { path: Routers.admin.events.route, element: <AdminEventsPage /> },
@@ -33,6 +34,7 @@ const sponsorRoutes = [
   { path: Routers.sponsor.events.route, element: <SponsorEventsPage /> },
   { path: Routers.sponsor.event.route, element: <SponsorEventPage /> },
   { path: Routers.sponsor.gifts.route, element: <GiftsPage /> },
+  { path: Routers.sponsor.booths.route, element: <BoothsPage /> },
 ];
 
 const eventOperatorRoutes = [

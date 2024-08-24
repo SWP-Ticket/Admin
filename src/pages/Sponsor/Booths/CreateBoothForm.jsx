@@ -22,52 +22,78 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import useFetch from "@/hooks/useFetch";
 import { useAuthStore } from "@/stores/auth.store";
+import { useEffect } from "react";
+import { useMemo } from "react";
 import { useState } from "react";
 
-const fetchBooth = (sponsorId) =>
-  fetch(
-    `${import.meta.env.VITE_API_KEY}/api/BoothRequest/sponsor/${sponsorId}`
-  );
-export function CreateGiftForm({ onCreate }) {
-  const sponsorId = useAuthStore((state) => state.userId);
-  const [responseBooth] = useFetch(fetchBooth, sponsorId);
+const fetchBooth = () =>
+  fetch(`${import.meta.env.VITE_API_KEY}/api/Booth?page=1&pageSize=10000`);
+export function CreateBoothForm({ onCreate }) {
+  //====
+  const [data, setData] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
 
-  const booths = responseBooth ? responseBooth?.data : [];
+  const itemList = useMemo(() => {
+    console.log(searchValue);
+    if (searchValue.length === 0) return data;
+
+    return data.filter(({ title }) =>
+      title.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [data, searchValue]);
+
+  //====
+  const sponsorId = useAuthStore((state) => state.userId);
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState(0);
-  const [boothId, setBoothId] = useState("");
+  const [location, setLocation] = useState("");
+  const [eventId, setEventId] = useState();
 
   const handleSave = async () => {
     try {
-      const newGift = {
+      const newBooth = {
+        sponsorId: Number(sponsorId),
         name,
         description,
-        quantity,
-        boothId,
+        location,
+        eventId,
       };
 
-      onCreate(newGift);
+      onCreate(newBooth);
 
       setName("");
       setDescription("");
-      setQuantity("");
-      setBoothId("");
+      setLocation("");
+      setEventId("");
     } catch (err) {
       console.log(err);
     }
   };
 
+  useEffect(() => {
+    fetch(
+      "https://ticketswp-cvb4bhguf9fmbte2.eastus-01.azurewebsites.net/api/Event?page=1&pageSize=1000"
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setData(data.data.listData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600">Create Gift</Button>
+        <Button className="bg-blue-500 hover:bg-blue-600">Create Booth</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create gift</DialogTitle>
+          <DialogTitle>Create booth</DialogTitle>
           <DialogDescription>
-            Create a gift here. Click save when you're done.
+            Create a booth here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -96,38 +122,42 @@ export function CreateGiftForm({ onCreate }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="quantity" className="text-right">
-              Quantity
+            <Label htmlFor="locaion" className="text-right">
+              Location
             </Label>
             <Input
-              id="quantity"
-              type="number"
+              id="locaion"
               placeholder="Enter quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="booth" className="text-right">
-              Booth
+              Event
             </Label>
-            <Select value={boothId} onValueChange={setBoothId}>
+
+            <Select value={eventId} onValueChange={setEventId}>
               <SelectTrigger className="w-[280px]">
                 <SelectValue placeholder="Select a booth" />
               </SelectTrigger>
               <SelectContent>
+                <input
+                  className="SelectSearchInput"
+                  value={searchValue}
+                  onChange={(e) => {
+                    setSearchValue(e.currentTarget.value ?? "");
+                  }}
+                  placeholder="Search Item ..."
+                />
                 <SelectGroup>
-                  {booths &&
-                    booths.map((e) => (
+                  {itemList &&
+                    itemList.map((e) => (
                       <SelectItem key={e.id} value={e.id}>
-                        {e.boothName}
+                        {e.title}
                       </SelectItem>
                     ))}
-                  {/* <SelectItem value="Visitor">Visitor</SelectItem> */}
-                  {/* <SelectItem value={3}>Sponsor</SelectItem>
-                  <SelectItem value={1}>Event Operator</SelectItem>
-                  <SelectItem value={2}>Checking Staff</SelectItem> */}
                 </SelectGroup>
               </SelectContent>
             </Select>

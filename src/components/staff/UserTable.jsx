@@ -16,6 +16,7 @@ import useFetch from "@/hooks/useFetch";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
 import { Button } from "../ui/button";
+import { toast } from "../ui/use-toast";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -48,21 +49,31 @@ function UserTable() {
 
   const handleCheckin = async (userId) => {
     try {
-      await fetch(
-        `${
-          import.meta.env.VITE_API_KEY
-        }/api/Attendee/attendee/${userId}/checkin`,
+      const res = await fetch(
+        `${import.meta.env.VITE_API_KEY}/api/Attendee/${userId}/checkin`,
         {
           method: "PUT",
           headers: {
             Accept: "*/*",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify("string"),
+          body: JSON.stringify("CheckedIn"),
         }
       );
+
+      if (!res.ok) {
+        console.log("chạy here 1");
+        const err = await res.json();
+        console.log(err);
+        console.log("chạy here 2");
+        throw new Error(err.message);
+      }
       refetch();
     } catch (err) {
+      toast({
+        title: "Error!",
+        description: err.message,
+      });
       console.log(err);
     }
   };

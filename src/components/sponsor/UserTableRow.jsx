@@ -1,5 +1,6 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "../ui/button";
+import GiftForm from "@/pages/Sponsor/Event/GiftForm";
 function UserTableRow({ item, onGift }) {
   return (
     <TableRow
@@ -19,7 +20,7 @@ function UserTableRow({ item, onGift }) {
         <Button
           variant="secondary"
           onClick={() => {
-            onGift();
+            onGift(item);
           }}
         >
           Gift

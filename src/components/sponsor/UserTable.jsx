@@ -11,11 +11,11 @@ import {
 import UserHeaderRow from "./UserHeaderRow";
 import UserTableRow from "./UserTableRow";
 import EditUserForm from "@/pages/Admin/UserManagement/EditUserForm";
-import { CreateUserForm } from "@/pages/Admin/UserManagement/CreateUserForm";
 import useFetch from "@/hooks/useFetch";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
 import { Button } from "../ui/button";
+import GiftForm from "@/pages/Sponsor/Event/GiftForm";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -28,7 +28,7 @@ function UserTable() {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const refetch = useAppStore((state) => state.refetch);
-
+  const [editingGift, setEditingGift] = useState(null);
   const [responseUser] = useFetch(fetchUser, eventId);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,9 +46,22 @@ function UserTable() {
     ? responseUser?.data?.slice(startIndex, startIndex + ITEMS_PER_PAGE)
     : [];
 
-  const handleGift = async (userId) => {
+  const handleGift = async (gift) => {
+    setEditingGift(gift);
+  };
+
+  const handleSaveEdit = async (updatedGift) => {
+    console.log(updatedGift);
     try {
-      console.log(userId);
+      await fetch(`${import.meta.env.VITE_API_KEY}/api/GiftReception`, {
+        method: "POST", // HTTP method
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedGift),
+      });
+      refetch();
     } catch (err) {
       console.log(err);
     }
@@ -74,8 +87,8 @@ function UserTable() {
               <UserTableRow
                 key={item.id}
                 item={item}
-                onGift={() => {
-                  handleGift(item.id);
+                onGift={(gift) => {
+                  handleGift(gift);
                 }}
               />
             ))}
@@ -105,6 +118,13 @@ function UserTable() {
             </PaginationItem>
           </PaginationContent>
         </Pagination>
+        {editingGift && (
+          <GiftForm
+            user={editingGift}
+            onClose={() => setEditingGift(null)}
+            onSave={handleSaveEdit}
+          />
+        )}
       </div>
     </div>
   );

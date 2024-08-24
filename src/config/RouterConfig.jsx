@@ -37,6 +37,10 @@ export const Routers = {
       label: "Gifts",
       route: "/sponsor/gifts",
     },
+    booths: {
+      label: "Booths",
+      route: "/sponsor/booths",
+    },
   },
   eventOperator: {
     events: {
