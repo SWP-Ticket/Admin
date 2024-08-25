@@ -30,13 +30,12 @@ function GiftForm({ user, onClose, onSave }) {
   const [searchValue, setSearchValue] = useState("");
 
   const itemList = useMemo(() => {
-    console.log(searchValue);
     if (searchValue.length === 0) return data;
 
-    return data.filter(({ title }) =>
-      title.toLowerCase().includes(searchValue.toLowerCase())
+    return data.filter(({ name }) =>
+      name.toLowerCase().includes(searchValue.toLowerCase())
     );
-  }, [searchValue]);
+  }, [data, searchValue]);
 
   const [giftId, setGiftId] = useState();
 
