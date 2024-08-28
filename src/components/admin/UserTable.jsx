@@ -57,6 +57,7 @@ function UserTable() {
         },
         body: JSON.stringify(newUser),
       });
+
       refetch();
     } catch (err) {
       console.log(err);

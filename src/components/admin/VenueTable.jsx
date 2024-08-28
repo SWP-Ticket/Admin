@@ -8,58 +8,56 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import GiftHeaderRow from "./GiftHeaderRow";
-import GiftTableRow from "./GiftTableRow";
+import VenueTableRow from "./VenueTableRow";
+import VenueHeaderRow from "./VenueHeaderRow";
+import { useSearchParams } from "react-router-dom";
 import useFetch from "@/hooks/useFetch";
-import { useAuthStore } from "@/stores/auth.store";
-import { CreateGiftForm } from "@/pages/Sponsor/Gifts/CreateGiftForm";
 import { useAppStore } from "@/stores/app.store";
-import EditGiftForm from "@/pages/Sponsor/Gifts/EditGiftForm";
 import { useToast } from "../ui/use-toast";
+import { CreateVenueForm } from "@/pages/Admin/Venues/CreateVenueForm";
+import EditVenueForm from "@/pages/Admin/Venues/EditVenueForm";
 
 const ITEMS_PER_PAGE = 7;
-const fetchGifts = (sponsorId) =>
-  fetch(`${import.meta.env.VITE_API_KEY}/api/Gift/Sponsor/${sponsorId}`);
-function GiftTable() {
-  const [editingGift, setEditingGift] = useState(null);
-  const sponsorId = useAuthStore((state) => state.userId);
-  const refetch = useAppStore((state) => state.refetch);
-  const [responseGifts] = useFetch(fetchGifts, sponsorId);
-  const { toast } = useToast();
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(
-    (responseGifts ? responseGifts?.data?.length : 0) / ITEMS_PER_PAGE
+const fetchEvent = (page, pageSize) =>
+  fetch(
+    `${
+      import.meta.env.VITE_API_KEY
+    }/api/Venue?page=${page}&pageSize=${pageSize}`
   );
+function VenueTable() {
+  const { toast } = useToast();
+  const [editingVenue, setEditingVenue] = useState(null);
+  const refetch = useAppStore((state) => state.refetch);
+  const [searchParams, setSearchParams] = useSearchParams({ page: "1" });
 
+  const [responseEvent] = useFetch(
+    fetchEvent,
+    searchParams.get("page"),
+    ITEMS_PER_PAGE
+  );
   const handlePageChange = (page) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
+    if (page === 0) return;
+
+    if (page > 0 && page <= responseEvent.data.totalPage) {
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        size: ITEMS_PER_PAGE.toString(),
+      });
+
+      setSearchParams(queryParams.toString());
     }
   };
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentData = responseGifts
-    ? responseGifts?.data?.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-    : [];
-  const handleEdit = (user) => {
-    setEditingGift(user);
-  };
-  const handleCreate = async (newGift) => {
-    console.log(newGift);
+
+  const handleCreate = async (newVenue) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_KEY}/api/Gift`, {
+      await fetch(`${import.meta.env.VITE_API_KEY}/api/Venue`, {
         method: "POST", // HTTP method
         headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newGift),
+        body: JSON.stringify(newVenue),
       });
-      if (!res.ok) {
-        // Handle non-200 responses
-        const err = await res.json();
-        console.log(err);
-        throw new Error(err.message);
-      }
       toast({
         title: "Success!",
         description: "Create Success",
@@ -68,15 +66,16 @@ function GiftTable() {
     } catch (err) {
       toast({
         title: "Error!",
-        description: err.message,
+        description: "Create Error",
       });
+      console.log(err);
     }
     // setUsers((prevUsers) => [...prevUsers, newUser]);
   };
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_KEY}/api/Gift/${id}`,
+        `${import.meta.env.VITE_API_KEY}/api/Venue/${item.id}`,
         {
           method: "DELETE",
           headers: {
@@ -99,14 +98,21 @@ function GiftTable() {
       });
       refetch();
     } catch (err) {
+      toast({
+        title: "Error!",
+        description: "Delete Error",
+      });
       console.log("Error:", err);
     }
+  };
+  const handleEdit = (venue) => {
+    setEditingVenue(venue);
   };
   const handleSaveEdit = async (id, updatedGift) => {
     try {
       console.log(updatedGift);
       const res = await fetch(
-        `${import.meta.env.VITE_API_KEY}/api/Gift/${id}`,
+        `${import.meta.env.VITE_API_KEY}/api/Venue/${id}`,
         {
           method: "PUT",
           headers: {
@@ -137,28 +143,28 @@ function GiftTable() {
       });
       console.log(err);
     }
-    setEditingGift(null);
+    setEditingVenue(null);
   };
   return (
     <div>
       <div className="flex justify-between  items-center px-3 py-5">
-        <h1 className="text-2xl  font-semibold">Gifts</h1>
-        <CreateGiftForm onCreate={handleCreate} />
+        <h1 className="text-2xl  font-semibold">Venues</h1>
+        <CreateVenueForm onCreate={handleCreate} />
       </div>
       <div className="flex flex-col h-[73vh] justify-between">
         <Table>
           <TableHeader>
-            <GiftHeaderRow />
+            <VenueHeaderRow />
           </TableHeader>
           <TableBody>
-            {currentData.map((item) => (
-              <GiftTableRow
+            {responseEvent?.data?.listData.map((item) => (
+              <VenueTableRow
                 key={item.id}
                 item={item}
                 onEdit={(value) => {
                   handleEdit(value);
                 }}
-                onDelete={(value) => handleDelete(value.id)}
+                onDelete={(data) => handleDelete(data)}
               />
             ))}
           </TableBody>
@@ -167,13 +173,13 @@ function GiftTable() {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => handlePageChange(currentPage - 1)}
+                onClick={() => handlePageChange(responseEvent?.data?.page - 1)}
               />
             </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
+            {[...Array(responseEvent?.data?.totalPage)].map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
-                  isActive={index + 1 === currentPage}
+                  isActive={index + 1 === responseEvent?.data?.page}
                   onClick={() => handlePageChange(index + 1)}
                 >
                   {index + 1}
@@ -182,16 +188,16 @@ function GiftTable() {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(currentPage + 1)}
+                onClick={() => handlePageChange(responseEvent?.data?.page + 1)}
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-        {editingGift && (
-          <EditGiftForm
-            gift={editingGift}
-            onClose={() => setEditingGift(null)}
-            onSave={(value) => handleSaveEdit(editingGift.id, value)}
+        {editingVenue && (
+          <EditVenueForm
+            venue={editingVenue}
+            onClose={() => setEditingVenue(null)}
+            onSave={(value) => handleSaveEdit(value.id, value)}
           />
         )}
       </div>
@@ -199,4 +205,4 @@ function GiftTable() {
   );
 }
 
-export default GiftTable;
+export default VenueTable;

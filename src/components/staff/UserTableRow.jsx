@@ -20,7 +20,7 @@ function UserTableRow({ item, onCheckin }) {
           <Button
             variant="secondary"
             onClick={() => {
-              onCheckin();
+              onCheckin(item);
             }}
           >
             Checkin

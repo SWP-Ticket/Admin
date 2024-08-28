@@ -10,37 +10,39 @@ import {
 } from "@/components/ui/pagination";
 import EventHeaderRow from "./EventHeaderRow";
 import EventTableRow from "./EventTableRow";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useFetch from "@/hooks/useFetch";
+import { useToast } from "../ui/use-toast";
 
-const ITEMS_PER_PAGE = 7;
-const fetchEvent = (page, pageSize) =>
+const ITEMS_PER_PAGE = 10000;
+const fetchEvent = (pageSize) =>
   fetch(
-    `${
-      import.meta.env.VITE_API_KEY
-    }/api/Event?page=${page}&pageSize=${pageSize}`
+    `${import.meta.env.VITE_API_KEY}/api/Event?page=1&pageSize=${pageSize}`
   );
 function EventTable() {
-  const [searchParams, setSearchParams] = useSearchParams({ page: "1" });
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const [responseEvent] = useFetch(
-    fetchEvent,
-    searchParams.get("page"),
-    ITEMS_PER_PAGE
+  const [responseEvent] = useFetch(fetchEvent, ITEMS_PER_PAGE);
+  const listEvents = responseEvent
+    ? responseEvent?.data?.listData.filter(
+        (f) => f.status === "Active" || f.status === "Ongoing"
+      )
+    : [];
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(
+    (listEvents ? listEvents?.length : 0) / ITEMS_PER_PAGE
   );
+
   const handlePageChange = (page) => {
-    if (page === 0) return;
-
-    if (page > 0 && page <= responseEvent.data.totalPage) {
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        size: ITEMS_PER_PAGE.toString(),
-      });
-
-      setSearchParams(queryParams.toString());
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
-
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentData = listEvents
+    ? listEvents?.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    : [];
   return (
     <div>
       <div className="flex justify-between  items-center px-3 py-5">
@@ -52,12 +54,19 @@ function EventTable() {
             <EventHeaderRow />
           </TableHeader>
           <TableBody>
-            {responseEvent?.data?.listData.map((item) => (
+            {currentData?.map((item) => (
               <EventTableRow
                 key={item.id}
                 item={item}
-                onView={() => {
-                  navigate(`/sponsor/events/${item.id}`);
+                onView={(data) => {
+                  if (data.status === "Ongoing") {
+                    navigate(`/sponsor/events/${item.id}`);
+                  } else {
+                    toast({
+                      title: "Error!",
+                      description: "Event not onging!!!",
+                    });
+                  }
                 }}
               />
             ))}
@@ -67,13 +76,13 @@ function EventTable() {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => handlePageChange(responseEvent?.data?.page - 1)}
+                onClick={() => handlePageChange(currentPage - 1)}
               />
             </PaginationItem>
-            {[...Array(responseEvent?.data?.totalPage)].map((_, index) => (
+            {[...Array(totalPages)].map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
-                  isActive={index + 1 === responseEvent?.data?.page}
+                  isActive={index + 1 === currentPage}
                   onClick={() => handlePageChange(index + 1)}
                 >
                   {index + 1}
@@ -82,7 +91,7 @@ function EventTable() {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(responseEvent?.data?.page + 1)}
+                onClick={() => handlePageChange(currentPage + 1)}
               />
             </PaginationItem>
           </PaginationContent>

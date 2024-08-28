@@ -16,6 +16,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
 import { Button } from "../ui/button";
 import GiftForm from "@/pages/Sponsor/Event/GiftForm";
+import { useToast } from "../ui/use-toast";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -26,6 +27,7 @@ const fetchUser = (eventId) =>
 
 function UserTable() {
   const { eventId } = useParams();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const refetch = useAppStore((state) => state.refetch);
   const [editingGift, setEditingGift] = useState(null);
@@ -61,6 +63,10 @@ function UserTable() {
         },
         body: JSON.stringify(updatedGift),
       });
+      toast({
+        title: "Success!",
+        description: "Update Success",
+      });
       refetch();
     } catch (err) {
       console.log(err);
@@ -88,7 +94,14 @@ function UserTable() {
                 key={item.id}
                 item={item}
                 onGift={(gift) => {
-                  handleGift(gift);
+                  if (gift.checkInStatus === "NotCheckedIn") {
+                    toast({
+                      title: "Error!",
+                      description: "User not checkin!!!",
+                    });
+                  } else {
+                    handleGift(gift);
+                  }
                 }}
               />
             ))}

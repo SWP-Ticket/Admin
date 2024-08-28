@@ -6,9 +6,12 @@ import { Routers } from "./config/RouterConfig";
 // Admin
 import AdminEventsPage from "./pages/Admin/Events/EventsPage";
 import UserManagementPage from "./pages/Admin/UserManagement/UserManagementPage";
+import TransactionsPage from "./pages/Admin/Transactions/TransactionsPage";
+import VenuesPage from "./pages/Admin/Venues/VenuesPage";
 // Staff
 import StaffEventsPage from "./pages/Staff/Events/EventsPage";
 import StaffEventPage from "./pages/Staff/Event/EventPage";
+
 // Sponsor
 import SponsorEventsPage from "./pages/Sponsor/Events/EventsPage";
 import SponsorEventPage from "./pages/Sponsor/Event/EventPage";
@@ -24,6 +27,8 @@ import BoothsPage from "./pages/Sponsor/Booths/BoothsPage";
 const adminRoutes = [
   { path: Routers.admin.events.route, element: <AdminEventsPage /> },
   { path: Routers.admin.userManagement.route, element: <UserManagementPage /> },
+  { path: Routers.admin.transactions.route, element: <TransactionsPage /> },
+  { path: Routers.admin.venues.route, element: <VenuesPage /> },
 ];
 
 const staffRoutes = [
@@ -58,6 +63,7 @@ function App() {
             ))}
           </Route>
           {/* Staff Routes */}
+
           <Route element={<StaffRoute />}>
             {staffRoutes.map((route) => (
               <Route

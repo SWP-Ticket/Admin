@@ -1,9 +1,10 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { formatDateToDDMMYYYYHHMMSS } from "@/utils/day";
-function EventTableRow({ item }) {
+import { Button } from "../ui/button";
+function EventTableRow({ item, onApprove, onCancel }) {
   return (
     <TableRow
-      className="items-center grid md:grid-cols-5  grid-cols-3  font-medium rounded-md  bg-[#FAFAFA]  mt-3  border-none py-2"
+      className="items-center grid md:grid-cols-6  grid-cols-6  font-medium rounded-md  bg-[#FAFAFA]  mt-3  border-none py-2"
       key={item?.title}
     >
       <TableCell className=" py-2">{item?.title}</TableCell>
@@ -19,6 +20,29 @@ function EventTableRow({ item }) {
       </TableCell>
       <TableCell className=" hidden md:block py-2 text-left">
         {item?.status}
+      </TableCell>
+      <TableCell className="text-center gap-3 py-2  ">
+        {item.status === "Ready" && (
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onApprove(item);
+              }}
+            >
+              Approve
+            </Button>
+            <Button
+              onClick={() => {
+                onCancel(item);
+              }}
+              className="text-red-600 hover:text-red-700"
+              variant="ghost"
+            >
+              Cancel
+            </Button>
+          </>
+        )}
       </TableCell>
     </TableRow>
   );

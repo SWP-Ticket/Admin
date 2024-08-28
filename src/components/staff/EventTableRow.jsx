@@ -25,7 +25,7 @@ function EventTableRow({ item, onView }) {
         <Button
           variant="secondary"
           onClick={() => {
-            onView();
+            onView(item);
           }}
         >
           View

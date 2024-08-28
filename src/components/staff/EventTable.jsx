@@ -13,12 +13,14 @@ import EventTableRow from "./EventTableRow";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useFetch from "@/hooks/useFetch";
 import { useAuthStore } from "@/stores/auth.store";
+import { useToast } from "../ui/use-toast";
 
 const ITEMS_PER_PAGE = 7;
 const fetchEvent = (staffId) =>
   fetch(`${import.meta.env.VITE_API_KEY}/api/Event/${staffId}/events`);
 function EventTable() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const staffId = useAuthStore((state) => state.userId);
   const [responseEvent] = useFetch(fetchEvent, staffId);
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,8 +56,16 @@ function EventTable() {
               <EventTableRow
                 key={item.id}
                 item={item}
-                onView={() => {
-                  navigate(`/staff/events/${item.id}`);
+                onView={(item) => {
+                  console.log(item);
+                  if (item.status === "Ongoing") {
+                    // navigate(`/staff/events/${item.id}`);
+                  } else {
+                    toast({
+                      title: "Chưa mở!",
+                      description: "Sự kiện chưa diễn ra",
+                    });
+                  }
                 }}
               />
             ))}

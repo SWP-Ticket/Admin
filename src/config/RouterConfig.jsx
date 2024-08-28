@@ -13,6 +13,14 @@ export const Routers = {
       label: "Events",
       route: "/admin/events",
     },
+    transactions: {
+      label: "Transactions",
+      route: "/admin/transactions",
+    },
+    venues: {
+      label: "Venues",
+      route: "/admin/venues",
+    },
   },
   staff: {
     events: {

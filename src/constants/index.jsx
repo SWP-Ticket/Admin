@@ -12,6 +12,16 @@ export const AdminLinks = [
     label: Routers.admin.events.label,
     route: Routers.admin.events.route,
   },
+  {
+    icon: <Box className="h-5 w-5" />,
+    label: Routers.admin.transactions.label,
+    route: Routers.admin.transactions.route,
+  },
+  {
+    icon: <Box className="h-5 w-5" />,
+    label: Routers.admin.venues.label,
+    route: Routers.admin.venues.route,
+  },
 ];
 export const StaffLinks = [
   {

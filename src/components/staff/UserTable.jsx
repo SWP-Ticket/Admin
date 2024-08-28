@@ -47,10 +47,10 @@ function UserTable() {
     ? responseUser?.data?.slice(startIndex, startIndex + ITEMS_PER_PAGE)
     : [];
 
-  const handleCheckin = async (userId) => {
+  const handleCheckin = async (item) => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_KEY}/api/Attendee/${userId}/checkin`,
+        `${import.meta.env.VITE_API_KEY}/api/Attendee/${item.id}/checkin`,
         {
           method: "PUT",
           headers: {
@@ -98,8 +98,8 @@ function UserTable() {
               <UserTableRow
                 key={item.id}
                 item={item}
-                onCheckin={() => {
-                  handleCheckin(item.id);
+                onCheckin={(data) => {
+                  handleCheckin(data);
                 }}
               />
             ))}

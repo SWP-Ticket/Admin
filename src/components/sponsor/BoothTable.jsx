@@ -56,36 +56,36 @@ function BoothTable() {
         console.log(err);
         throw new Error(err.message);
       }
-      const jsonData = await res.json();
-      console.log(jsonData);
-      const newId = jsonData.data.id;
-      await fetch(
-        `https://ticketswp-cvb4bhguf9fmbte2.eastus-01.azurewebsites.net/api/BoothRequest/ChangeRequestStatus/${newId}`,
-        {
-          method: "PUT",
-          headers: {
-            Accept: "*/*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: "Approved",
-          }),
-        }
-      );
+      // const jsonData = await res.json();
+      // console.log(jsonData);
+      // const newId = jsonData.data.id;
+      // await fetch(
+      //   `https://ticketswp-cvb4bhguf9fmbte2.eastus-01.azurewebsites.net/api/BoothRequest/ChangeRequestStatus/${newId}`,
+      //   {
+      //     method: "PUT",
+      //     headers: {
+      //       Accept: "*/*",
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       status: "Approved",
+      //     }),
+      //   }
+      // );
 
-      await fetch(
-        `https://ticketswp-cvb4bhguf9fmbte2.eastus-01.azurewebsites.net/api/Booth/ChangeBoothStatus/${newId}`,
-        {
-          method: "PUT",
-          headers: {
-            Accept: "*/*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: "Opened",
-          }),
-        }
-      );
+      // await fetch(
+      //   `https://ticketswp-cvb4bhguf9fmbte2.eastus-01.azurewebsites.net/api/Booth/ChangeBoothStatus/${newId}`,
+      //   {
+      //     method: "PUT",
+      //     headers: {
+      //       Accept: "*/*",
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       status: "Opened",
+      //     }),
+      //   }
+      // );
 
       refetch();
     } catch (err) {
