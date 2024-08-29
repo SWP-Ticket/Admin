@@ -87,7 +87,9 @@ function GiftTable() {
       );
 
       if (!res.ok) {
-        throw new Error("Failed to delete");
+        const err = await res.json();
+        console.log(err);
+        throw new Error(err.message);
       }
 
       const data = await res.json();
@@ -99,6 +101,10 @@ function GiftTable() {
       });
       refetch();
     } catch (err) {
+      toast({
+        title: "Error!",
+        description: err.message,
+      });
       console.log("Error:", err);
     }
   };
